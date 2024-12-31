@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-pod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-pod
+  template:
+    metadata:
+      labels:
+        app: mysql-pod
+    spec: 
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-cred
+                key: MYSQL_ROOT_PASSWORD
+          - name: MYSQL_ROOT_USER
+            valueFrom:
+              secretKeyRef:
+                name: mysql-cred
+                key: MYSQL_ROOT_USER
+          - name: MYSQL_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: mysql-config
+                key: MYSQL_DATABASE
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            - name: mysql-logs
+              mountPath: /var/log/mysql
+          
+        - name: log-container
+          image: busybox
+          command: ["sh", "-c", "tail -f /logs/*.log"]
+          volumeMounts:
+            - name: mysql-logs
+              mountPath: /logs
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+        - name: mysql-logs
+          persistentVolumeClaim:
+            claimName: mysql-pvc
