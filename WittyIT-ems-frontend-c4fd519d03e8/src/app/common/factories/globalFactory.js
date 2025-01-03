@@ -14,7 +14,7 @@
 			globalFactoryItems.leaveList = 0;
 			globalFactoryItems.newCycleInitiated = false;
 			globalFactoryItems.currentRoute = '';
-			globalFactoryItems.serverUrl = 'http://34.172.244.177:8080/ems';
+			globalFactoryItems.serverUrl = 'http://34.66.203.145:8080/ems';
 			globalFactoryItems.isLoading = true;
 			globalFactoryItems.isModalOpen = false;
 			globalFactoryItems.reviewCount = [];

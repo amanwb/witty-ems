@@ -7,12 +7,29 @@ spec:
   capacity:
     storage: 10Gi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   storageClassName: standard 
   gcePersistentDisk:
     pdName: mysql-backup
     fsType: ext4
+
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata: 
+#   name: mysql-pv
+
+# spec:
+#   capacity:
+#     storage: 10Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   persistentVolumeReclaimPolicy: Retain
+#   storageClassName: standard 
+#   gcePersistentDisk:
+#     pdName: mysql-logs
+#     fsType: ext4
 
 ---
 apiVersion: v1
@@ -21,8 +38,21 @@ metadata:
   name: mysql-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 10Gi
   storageClassName: standard 
+---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: mysql-pvc-logs
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 10Gi
+#   storageClassName: standard 
+

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: log-access-pod
+spec:
+  containers:
+  - name: busybox
+    image: busybox
+    command: ["sh", "-c", "tail -f /var/logs/mysql/*.log"]
+    volumeMounts:
+    - name: mysql-data
+      mountPath: /var/logs/mysql  
+  volumes:
+  - name: mysql-data
+    persistentVolumeClaim:
+      claimName: mysql-pvc

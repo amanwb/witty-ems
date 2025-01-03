@@ -12,6 +12,20 @@ spec:
       labels:
         app: ems-backend
     spec: 
+      initContainers:
+        - name: wait-for-mysql
+          image: busybox:1.35  # Lightweight image with simple shell utilities
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until nc -zv mysql-db 3306; do
+                echo "Waiting for MySQL to be ready..."
+                sleep 2
+              done
+              echo "MySQL is ready, proceeding with application startup."
+          # Make sure init container finishes before main container starts
+          imagePullPolicy: IfNotPresent
       containers:
         - name: java-ems-backend
           image: amanchauhan810/ems-backend

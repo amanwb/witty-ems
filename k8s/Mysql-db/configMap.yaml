@@ -4,3 +4,11 @@ metadata:
   name: mysql-config
 data:
   MYSQL_DATABASE: ems  
+  my.cnf: |
+    [mysqld]
+    log_error = /var/logs/mysql/error.log
+    general_log = 1
+    general_log_file = /var/logs/mysql/general.log
+    slow_query_log = 1
+    slow_query_log_file = /var/logs/mysql/slow.log
+    long_query_time = 2

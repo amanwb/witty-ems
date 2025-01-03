@@ -11,44 +11,54 @@ spec:
     metadata:
       labels:
         app: mysql-pod
-    spec: 
+    spec:
       containers:
-        - name: mysql
-          image: mysql:8.0
-          env:
-          - name: MYSQL_ROOT_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: mysql-cred
-                key: MYSQL_ROOT_PASSWORD
-          - name: MYSQL_ROOT_USER
-            valueFrom:
-              secretKeyRef:
-                name: mysql-cred
-                key: MYSQL_ROOT_USER
-          - name: MYSQL_DATABASE
-            valueFrom:
-              configMapKeyRef:
-                name: mysql-config
-                key: MYSQL_DATABASE
-          ports:
-            - containerPort: 3306
-          volumeMounts:
-            - name: mysql-data
-              mountPath: /var/lib/mysql
-            - name: mysql-logs
-              mountPath: /var/log/mysql
-          
-        - name: log-container
-          image: busybox
-          command: ["sh", "-c", "tail -f /logs/*.log"]
-          volumeMounts:
-            - name: mysql-logs
-              mountPath: /logs
-      volumes:
+      - name: mysql
+        image: mysql:8.0
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-cred
+              key: MYSQL_ROOT_PASSWORD
+        - name: MYSQL_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: MYSQL_DATABASE
+        ports:
+        - containerPort: 3306
+        volumeMounts:
         - name: mysql-data
-          persistentVolumeClaim:
-            claimName: mysql-pvc
-        - name: mysql-logs
-          persistentVolumeClaim:
-            claimName: mysql-pvc
+          mountPath: /var/lib/mysql
+        - name: mysql-data
+          mountPath: /var/logs/mysql
+        - name: mysql-config
+          mountPath: /etc/mysql/conf.d
+      - name: log-container
+        image: busybox
+        command: ["sh", "-c", "tail -f /var/logs/mysql/*.log"]
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/logs/mysql
+      volumes:
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+      - name: mysql-config
+        configMap:
+          name: mysql-config

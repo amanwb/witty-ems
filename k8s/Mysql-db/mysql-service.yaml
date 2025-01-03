@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: mysql-db
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: mysql-pod
   ports:

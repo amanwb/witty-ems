@@ -14,7 +14,7 @@ spec:
     spec: 
       containers:
         - name: java-ems-frontend
-          image: amanchauhan810/ems-frontend:latest
+          image: amanchauhan810/ems-frontend:v2
           ports:
             - containerPort: 9090
 ---
