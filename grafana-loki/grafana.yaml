@@ -10,25 +10,30 @@ spec:
       app: grafana
   template:
     metadata:
+      name: grafana
       labels:
         app: grafana
     spec:
       containers:
+      - name: grafana
+        image: grafana/grafana:latest
+        ports:
         - name: grafana
-          image: grafana/grafana:latest
-          ports:
-            - containerPort: 3000
-          env:
-            - name: GF_SECURITY_ADMIN_PASSWORD
-              value: admin
-          # volumeMounts:
-          #   - mountPath: /var/lib/grafana
-          #     name: grafana-storage
-      # volumes:
-      #   - name: grafana-storage
-      #     persistentVolumeClaim:
-      #       claimName: grafana-pvc
-
+          containerPort: 3000
+        
+        volumeMounts:
+          - mountPath: /var/lib/grafana
+            name: grafana-storage
+          - mountPath: /etc/grafana/provisioning/datasources
+            name: grafana-datasources
+            readOnly: false
+      volumes:
+        - name: grafana-storage
+          emptyDir: {}
+        - name: grafana-datasources
+          configMap:
+              defaultMode: 420
+              name: grafana-datasources
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -44,17 +49,26 @@ spec:
 
 ---
 apiVersion: v1
-kind: Service
+kind: ConfigMap
 metadata:
-  name: grafana
+  name: grafana-datasources
   namespace: monitoring
-spec:
-  type: LoadBalancer
-  ports:
-    - port: 3000
-      targetPort: 3000
-  selector:
-    app: grafana
+data:
+  prometheus.yaml: |-
+    {
+        "apiVersion": 1,
+        "datasources": [
+            {
+               "access":"proxy",
+                "editable": true,
+                "name": "prometheus",
+                "orgId": 1,
+                "type": "prometheus",
+                "url": "http://prometheus-service.monitoring.svc:8080",
+                "version": 1
+            }
+        ]
+    }
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -71,3 +85,21 @@ spec:
   gcePersistentDisk:
     pdName: grafana-storage
     fsType: ext4
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: monitoring
+  annotations:
+      prometheus.io/scrape: 'true'
+      prometheus.io/port:   '3000'
+spec:
+  selector: 
+    app: grafana
+  type: LoadBalancer  
+  ports:
+    - port: 3000
+      targetPort: 3000
+
