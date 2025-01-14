@@ -19,8 +19,8 @@ data:
           summary: High Memory Usage
   prometheus.yml: |-
     global:
-      scrape_interval: 5s
-      evaluation_interval: 5s
+      scrape_interval: 15s
+      evaluation_interval: 15s
     rule_files:
       - /etc/prometheus/prometheus.rules
     alerting:
@@ -30,6 +30,7 @@ data:
         - targets:
           - "alertmanager.monitoring.svc:9093"
     scrape_configs:
+      # Scrape Node Exporter for node-level metrics
       - job_name: 'node-exporter'
         kubernetes_sd_configs:
           - role: endpoints
@@ -37,6 +38,8 @@ data:
         - source_labels: [__meta_kubernetes_endpoints_name]
           regex: 'node-exporter'
           action: keep
+      
+      # Scrape Kubernetes API Server
       - job_name: 'kubernetes-apiservers'
         kubernetes_sd_configs:
         - role: endpoints
@@ -48,6 +51,8 @@ data:
         - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
           action: keep
           regex: default;kubernetes;https
+      
+      # Scrape Kubernetes Nodes (node-level metrics)
       - job_name: 'kubernetes-nodes'
         scheme: https
         tls_config:
@@ -64,6 +69,8 @@ data:
           regex: (.+)
           target_label: __metrics_path__
           replacement: /api/v1/nodes/${1}/proxy/metrics
+      
+      # Scrape Kubernetes Pods (container-level metrics)
       - job_name: 'kubernetes-pods'
         kubernetes_sd_configs:
         - role: pod
@@ -88,9 +95,13 @@ data:
         - source_labels: [__meta_kubernetes_pod_name]
           action: replace
           target_label: kubernetes_pod_name
+      
+      # Scrape kube-state-metrics for cluster state metrics
       - job_name: 'kube-state-metrics'
         static_configs:
           - targets: ['kube-state-metrics.kube-system.svc.cluster.local:8080']
+      
+      # Scrape cAdvisor for container-level metrics
       - job_name: 'kubernetes-cadvisor'
         scheme: https
         tls_config:
@@ -107,6 +118,8 @@ data:
           regex: (.+)
           target_label: __metrics_path__
           replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+      
+      # Scrape services annotated for Prometheus
       - job_name: 'kubernetes-service-endpoints'
         kubernetes_sd_configs:
         - role: endpoints
@@ -135,3 +148,6 @@ data:
         - source_labels: [__meta_kubernetes_service_name]
           action: replace
           target_label: kubernetes_name
+
+
+## this is the update configMap based on 315 dashboard
