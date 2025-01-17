@@ -126,4 +126,10 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: default
-    namespace: monitoring
+    namespace: logging
+---
+# ServiceAccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: promtail-serviceaccount
