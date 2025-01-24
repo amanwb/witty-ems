@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: Argo-CD
+spec:
+  selector:
+    matchLabels:
+      app: Argo-CD
+  template:
+    metadata:
+      labels:
+        app: Argo-CD
+    spec:
+      containers:
+      - name: Argo-CD
+        image: nginx:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: Argo-CD
+          mountPath: /etc/
+    
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: Argo-CD
+  ports:
+  - port: 80
+    targetPort: 80
+  type: LoadBalancer
