@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: nginx-server
-        image: nginx:latest
+        image: amanchauhan810/ems-frontend:v2
         resources:
           requests:
             memory: 500Mi
