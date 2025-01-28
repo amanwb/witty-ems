@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - amanchauhan810/ems-frontend:v3
