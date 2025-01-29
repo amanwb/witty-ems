@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: argo-server
-        image: amanchauhan810/ems-frontend:v2
+        image: amanchauhan810/ems-frontend:v1
         resources:
           requests:
             memory: 500Mi
