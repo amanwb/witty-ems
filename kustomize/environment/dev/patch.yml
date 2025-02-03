@@ -1,0 +1,12 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: my-app
+# spec:
+#   replicas: 3  # Dev ke liye kam replicas
+#   template:
+#     spec:
+#       containers:
+#         - name: my-app
+#           image: 192.168.1.18:5000/test:1.0.0 
+      

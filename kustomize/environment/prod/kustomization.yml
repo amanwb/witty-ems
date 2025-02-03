@@ -1,0 +1,5 @@
+# namespace: prod
+# bases:
+#   - ../../base
+# patchesStrategicMerge:
+# - patch.yml
